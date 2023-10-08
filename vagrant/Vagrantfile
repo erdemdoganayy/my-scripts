@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+  config.vm.network "private_network", type: "static", ip: "192.168.56.158"
+  config.ssh.forward_agent = true
+  # Port forwarding
+  config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", guest: 9000, host: 9000
+  config.vm.network "forwarded_port", guest: 10000, host: 10000
+  config.vm.network "forwarded_port", guest: 11000, host: 11000
+  config.vm.network "forwarded_port", guest: 12000, host: 12000
+  
+
+  config.vm.provision "shell", inline: <<-SHELL
+
+    # Update package list and install dependencies
+    apt-get update -y
+    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+    # Install Docker
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    apt-get update -y
+    apt-get install -y docker-ce
+
+    # Docker-compose Install
+    sudo curl -fsSL "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+
+    sudo usermod -aG docker vagrant
+    sudo newgrp docker
+
+  SHELL
+end
+#ssh-keygen -m PEM -t rsa -b 4096 -> RSA KEY OLUŞTURMAK İÇİN
