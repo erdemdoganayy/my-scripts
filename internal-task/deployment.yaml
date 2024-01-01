@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-secret
+  namespace: default
+type: Opaque
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-configmap
+  namespace: default
+data:
+  REDIS_APPEND_RAND_MAX_NUMBER: "20"
+  REDIS_APPEND_SLEEP_SECS: "2"
+  REDIS_DELETE_CHANCE_EACH_LOOP: "20"
+  REDIS_DELETE_RAND_MAX_NUMBER: "20"
+  REDIS_HOST: 192.168.49.2
+  REDIS_LIST_KEY: mylist
+  REDIS_PORT: "31961"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis-simulator
+        image: jrdeveloper06/redis-simulator:0812
+        command: ["python", "redis-client-simulator.py"]
+        ports:
+        - containerPort: 6379
+        envFrom:
+        - configMapRef:
+            name: redis-configmap
+        - secretRef:
+            name: redis-secret

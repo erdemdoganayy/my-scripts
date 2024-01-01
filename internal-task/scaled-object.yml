@@ -1,0 +1,23 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: nginx-scaledobject
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1  # Optional. Default: apps/v1
+    kind: Deployment 
+    name: nginx-deployment        # Optional. Default: Deployment
+  pollingInterval: 5
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: redis
+    metadata:
+      address: 192.168.49.2:31961
+      listName: mylist # Required
+      listLength: "5" # Required
+      activationListLength: "5" # optional
+      enableTLS: "false" # optional
+      unsafeSsl: "false" # optional
+      databaseIndex: "0" # optional
