@@ -1,0 +1,42 @@
+
+pod:
+  name: nginx
+  image: nginx
+  labels:
+    app: nginx
+  ports: 80
+  volumeMounts:
+    - mountPath: "/var/www/html"
+      name: mypd
+  volumes:
+  - name: mypd
+    persistentVolumeClaim:
+      claimName: pvc-1
+ 
+  persistentVolume:
+    - name: pv-1
+      storage: 1Gi
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteOnce
+      persistentVolumeReclaimPolicy: Recycle
+      storageClassName: slow
+      hostPath: /data
+
+  persistentVolumeClaim:
+    - name: pvc-1
+      accessModes:
+        - ReadWriteOnce
+      volumeMode: Filesystem
+      storage: 1Gi
+      storageClassName: slow
+
+  service:
+    name: nginx-service
+    type: NodePort
+    protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30000 
+
+## Test

@@ -1,0 +1,27 @@
+{{- if .Values.pod }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Values.pod.name }}
+  labels: 
+    app: {{ .Values.pod.labels.app }}
+spec:
+  containers:
+    - name: {{ .Values.pod.name }}
+      image: {{ .Values.pod.image }}
+      ports: 
+        - containerPort: {{ .Values.pod.ports }}
+      {{- if .Values.pod.volumeMounts }}
+      volumeMounts:
+        {{- range .Values.pod.volumeMounts }}
+        - mountPath: {{ .mountPath }}
+          name: {{ .name }}
+        {{- end }}
+      {{- end }}
+  volumes:
+  {{- range .Values.pod.volumes }}
+    - name: {{ .name }}
+      persistentVolumeClaim:
+        claimName: {{ .persistentVolumeClaim.claimName}}
+  {{- end }}
+  {{- end }}
